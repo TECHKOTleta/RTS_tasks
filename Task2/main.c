@@ -2,72 +2,64 @@
 #include <stdlib.h>
 #include <time.h>
 #include <locale.h>
+#include <math.h>
 #include "data.h"
-#include <sqlite3.h>
+#include "hist.h"
+#include "bdfile.h"
 
 
 int main() {
 
     setlocale(LC_ALL, "ru_RU.UTF-8"); //установка кириллического вывода 
     int rows = 1000, cols = 1000;
-
-    //-------------------работа с БД----------------------
-    sqlite3* DB; 
-    int exit = 0; 
-    exit = sqlite3_open("example.db", &DB); 
-  
-    if (exit) { 
-        printf("Error open DB\n");
-    } 
-    else
-        printf("Opened Database Successfully!\n");
-
-    char *sql_create_table = "DROP TABLE IF EXISTS signal;"
-                "CREATE TABLE signal(id INTEGER PRIMARY KEY AUTOINCREMENT, time FLOAT);";
-    
-    enter_ = sqlite3_exec(DB, sql_create_table, 0, 0);
-    if (enter_ != SQLITE_OK ) {
-        printf("Ошибка добавления таблицы\n");
-    }
-    else {
-        printf("Таблица создана\n");
-    }
-    sqlite3_close(DB);
-
-
-    //-----------------конец работы с БД--------------------
-
     int **mos = malloc(rows * sizeof(int*)); //выделение памяти под двумерный массив
-
     for (int i = 0; i < rows; i++) {
         
         mos[i] = malloc(cols * sizeof(int));
 
     }
 
+    int histogram_data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    float histogram_data_norm[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     //-----------------------отчет времени для do0---------------------
-    int time = clock(); //начало отчета времени
+    int time; //начало отчета времени
 
     for (int i = 0; i < 10000; i++) {
-
+        time = clock();
         do0(mos);
-
+        time = clock() - time; //подсчет секунд
+        int index = ceil((float)time / CLOCKS_PER_SEC * 500) - 1; //500 есть сокращение 1000/2, где 1000 - перевод из секунду в милисекунды, а 2 - ширина столбца гистограммы в 2мс, -1 ради индексации
+        //printf("На выполнение функции do0 10.000 раз потрачено %f миллисекундсекунд   %d\n", (float)time / CLOCKS_PER_SEC, index);
+        histogram_data[index]++;
     }
-    time = clock() - time; //подсчет секунд
+    
+    norm_hist(histogram_data, histogram_data_norm);
+    printf("Рузельтаты работы do0: \n");
+    draw_hist(histogram_data_norm);
 
-    printf("На выполнение функции do0 10.000 раз потрачено %f секунд\n", (float)time / CLOCKS_PER_SEC);
-
+    for (int i = 0; i < 10; i++) {
+        //printf("%d ", histogram_data[i]);
+        histogram_data[i] = 0;
+    }
 
     //-----------------------отчет времени для do1---------------------
-    time = clock(); //начало отчета времени
-
     for (int i = 0; i < 10000; i++) {
-
+        time = clock();
         do1(mos);
-
+        time = clock() - time; //подсчет секунд
+        int index = ceil((float)time / CLOCKS_PER_SEC * 500) - 1; 
+        //printf("На выполнение функции do1 10.000 раз потрачено %f миллисекунд    %d\n", (float)time / CLOCKS_PER_SEC, index);
+        histogram_data[index]++;
     }
-    time = clock() - time; //подсчет секунд
 
-    printf("На выполнение функции do1 10.000 раз потрачено %f секунд\n", (float)time / CLOCKS_PER_SEC);
+    norm_hist(histogram_data, histogram_data_norm);
+    printf("Рузельтаты работы do1: \n");
+    draw_hist(histogram_data_norm);
+    
+    for (int i = 0; i < 10; i++) {
+        //printf("%d ", histogram_data[i]);
+        histogram_data[i] = 0;
+    }
+
 }
