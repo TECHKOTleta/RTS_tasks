@@ -41,9 +41,11 @@ int main() {
     draw_hist(histogram_data_norm);
 
     //--------------------запись результатов в БД----------------------
+    int counting_success = 0;
     for (int j = 0; j < 10; j++) {
-        insert(histogram_data[j], 0, j);
+        counting_success = insert(histogram_data[j], 0, j, counting_success);
     }
+    printf("Успешно заполнено %d/10 полей в БД\n", counting_success);
 
     //--------------------обнуление гистограммы----------------------
     for (int i = 0; i < 10; i++) {
@@ -66,11 +68,12 @@ int main() {
     draw_hist(histogram_data_norm);
     
     //--------------------запись результатов в БД----------------------
+    counting_success = 0;
     for (int j = 0; j < 10; j++) {
-        insert(histogram_data[j], 1, j);
+        counting_success = insert(histogram_data[j], 1, j, counting_success);
     }
+    printf("Успешно заполнено %d/10 полей в БД\n", counting_success);
     
-
     //--------------------обнуление гистограммы----------------------
     for (int i = 0; i < 10; i++) {
         //printf("%d ", histogram_data[i]);
