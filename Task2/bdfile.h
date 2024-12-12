@@ -2,6 +2,6 @@
 #define BDFILE_H
 
 void create();
-void insert(int histogram_data, int i, int j);
+int insert(int histogram_data, int i, int j, int counting_success);
 
 #endif

@@ -22,13 +22,12 @@ void create() {
         printf("Ошибка добавления таблицы\n");
     }
     else {
-        printf("Таблица создана\n");
+        printf("Таблица range создана\n");
     }
     sqlite3_close(DB);
-
 }
 
-void insert(int histogram_data, int i, int j) {
+int insert(int histogram_data, int i, int j, int counting_success) {
     sqlite3* DB;
     int exit = sqlite3_open("histogram.db", &DB);
 
@@ -43,7 +42,6 @@ void insert(int histogram_data, int i, int j) {
     if (exit != SQLITE_OK) {
         printf("Ошибка подготовки запроса: %s\n", sqlite3_errmsg(DB));
         sqlite3_close(DB);
-        return;
     }
 
     char fir[10], sec[10], third[10], four[10];
@@ -62,9 +60,11 @@ void insert(int histogram_data, int i, int j) {
         printf("Ошибка выполнения запроса\n");
     }
     else {
-        printf("Данные успешно добавлены\n");
+        counting_success = counting_success +1;
     }
 
     sqlite3_finalize(stmt);
     sqlite3_close(DB);
+
+    return (counting_success);
 }
