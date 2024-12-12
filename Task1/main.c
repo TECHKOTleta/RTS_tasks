@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <locale.h>
 #include "hist.h"
 
@@ -13,16 +14,16 @@ int main() {
 	printf("Введите min и max, разделяя enter\n");
 	int m1, m2;
 	scanf("%d", &min); scanf("%d", &max); //переменные из файла hist
-	int a = 0;
-	printf("Вводите значения через enter, окончить 0\n");
-	scanf("%d", &a);
-	while(a != 0){
+	char temp[5] = "";
+	printf("Вводите значения через enter, окончить -e\n");
+	scanf("%s", &temp);
+	while(temp[0] != '-' && temp[1] != 'e'){
+		int a = atoi(temp);
 		put_value(a, histogram);
-		scanf("%d", &a);
+		scanf("%s", &temp);
 	}
 
 	norm_hist(histogram, histogram_norm);
-
 	draw_hist(histogram_norm);
 	
 	return 0;
